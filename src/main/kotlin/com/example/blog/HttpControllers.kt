@@ -6,14 +6,17 @@ import org.springframework.web.server.ResponseStatusException
 
 @RestController
 @RequestMapping("/api/article")
-class ArticleController(private val repository: ArticleRepository) {
+class ArticleController(private val repository: ArticleRepository, private val articleMapper: ArticleMapper) {
 
-	@GetMapping("/")
-	fun findAll() = repository.findAllByOrderByAddedAtDesc()
+    @GetMapping("/")
+    fun findAll() = repository.findAllByOrderByAddedAtDesc()
 
-	@GetMapping("/{slug}")
-	fun findOne(@PathVariable slug: String) =
-			repository.findBySlug(slug) ?: throw ResponseStatusException(NOT_FOUND, "This article does not exist")
+    @GetMapping("/{slug}")
+    fun findOne(@PathVariable slug: String) =
+        articleMapper.article2ArticleDto(repository.findBySlug(slug)) ?: throw ResponseStatusException(
+            NOT_FOUND,
+            "This article does not exist"
+        )
 
 }
 
@@ -21,9 +24,10 @@ class ArticleController(private val repository: ArticleRepository) {
 @RequestMapping("/api/user")
 class UserController(private val repository: UserRepository) {
 
-	@GetMapping("/")
-	fun findAll() = repository.findAll()
+    @GetMapping("/")
+    fun findAll() = repository.findAll()
 
-	@GetMapping("/{login}")
-	fun findOne(@PathVariable login: String) = repository.findByLogin(login) ?: throw ResponseStatusException(NOT_FOUND, "This user does not exist")
+    @GetMapping("/{login}")
+    fun findOne(@PathVariable login: String) =
+        repository.findByLogin(login) ?: throw ResponseStatusException(NOT_FOUND, "This user does not exist")
 }
